@@ -80,11 +80,6 @@ crypto_lock_cb(int mode, int n, const char* file, int line)
 }
 
 
-static void
-spedye_init_ssl()
-{
-}
-
 static int have_init_spedye = 0;
 
 void

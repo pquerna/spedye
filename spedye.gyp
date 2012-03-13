@@ -20,6 +20,7 @@
       ],
      'sources': [
        'src/spedye_init.c',
+       'src/spedye_master.c',
      ],
      'include_dirs': [
        'src',

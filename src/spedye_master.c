@@ -15,26 +15,35 @@
  *
  */
 
-#ifndef _SPEDYE_H_
-#define _SPEDYE_H_
+#include "spedye.h"
+#include <stdlib.h>
 
-#include "uv.h"
+int
+spedye_master_create(spedye_master_t **m_out, spedye_conf_t *conf, uv_loop_t *loop)
+{
+  spedye_master_t *m;
 
-typedef struct spedye_conf_t {
-  const char *certpath;
-  const char *keypath;
-} spedye_conf_t;
+  *m_out = NULL;
 
-typedef struct spedye_master_t {
-  uv_loop_t *loop;
-} spedye_master_t;
+  m = malloc(sizeof(spedye_master_t));
+  m->loop = loop;
+  uv_ref(m->loop);
 
+  *m_out = m;
 
-void spedye_process_init();
-void spedye_process_destroy();
+  return 0;
+}
 
-int spedye_master_create(spedye_master_t **m, spedye_conf_t *conf, uv_loop_t *loop);
-int spedye_master_run(spedye_master_t *m);
-void spedye_master_destroy(spedye_master_t *m);
+int
+spedye_master_run(spedye_master_t *m)
+{
+  return 0;
+}
 
-#endif
+void
+spedye_master_destroy(spedye_master_t *m)
+{
+  uv_unref(m->loop);
+  free(m);
+}
+
