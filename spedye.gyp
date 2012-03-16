@@ -5,12 +5,14 @@
      'dependencies': [
        'deps/http-parser/http_parser.gyp:http_parser',
        'deps/uv/uv.gyp:uv',
-       'deps/openssl/openssl.gyp:openssl'
+       'deps/openssl/openssl.gyp:openssl',
+       'deps/spdylay.gyp:spdylay',
      ],
      'export_dependent_settings': [
        'deps/http-parser/http_parser.gyp:http_parser',
        'deps/uv/uv.gyp:uv',
-       'deps/openssl/openssl.gyp:openssl'
+       'deps/openssl/openssl.gyp:openssl',
+       'deps/spdylay.gyp:spdylay',
       ],
       'conditions': [
         ['OS=="linux" or OS=="freebsd" or OS=="openbsd" or OS=="solaris"', {
