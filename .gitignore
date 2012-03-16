@@ -1,3 +1,4 @@
 deps
+out
 options.gypi
 *.xcodeproj
