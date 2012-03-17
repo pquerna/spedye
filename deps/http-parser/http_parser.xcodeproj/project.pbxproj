@@ -1,0 +1,446 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		BE5B788D75C6141F22FC2EA7 /* All */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 3CEF0D2A59ADFC4BE87AC8FC /* Build configuration list for PBXAggregateTarget "All" */;
+			buildPhases = (
+			);
+			dependencies = (
+				18B1B6AD61407C878B8D5ADE /* PBXTargetDependency */,
+				ED6027DC36E18B8A1B49042C /* PBXTargetDependency */,
+			);
+			name = All;
+			productName = All;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		5F4B3573D655B0E645CD501C /* http_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = 2D90D9ED4C02D0A63D926053 /* http_parser.c */; };
+		9992BBBF0498B54CE451063D /* libhttp_parser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1801301F7038583B51A4D241 /* libhttp_parser.a */; };
+		A66EC485F914B82E9A40556E /* test.c in Sources */ = {isa = PBXBuildFile; fileRef = 8A72D3E7ACFC87E2FF268E3D /* test.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3541BF622FB9E8B08B6A3121 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 556444191BAB19E0CEE666A6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2C3D692EDB432A59FB72344A;
+			remoteInfo = http_parser;
+		};
+		D1BCA596931897B1206BCDE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 556444191BAB19E0CEE666A6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2C3D692EDB432A59FB72344A;
+			remoteInfo = http_parser;
+		};
+		FAC07E5833BA279D737464C2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 556444191BAB19E0CEE666A6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 954206F0294F950196E35C9F;
+			remoteInfo = test;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		17695B4015753DD1DAD3B3D8 /* common.gypi */ = {isa = PBXFileReference; lastKnownFileType = text; name = common.gypi; path = ../../common.gypi; sourceTree = "<group>"; };
+		1801301F7038583B51A4D241 /* libhttp_parser.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libhttp_parser.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2D90D9ED4C02D0A63D926053 /* http_parser.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = http_parser.c; sourceTree = "<group>"; };
+		51B75EA9BC03495B89EBCAB2 /* http_parser.gyp */ = {isa = PBXFileReference; lastKnownFileType = text; path = http_parser.gyp; sourceTree = "<group>"; };
+		65CA71B46187CBCF5CC336F0 /* options.gypi */ = {isa = PBXFileReference; lastKnownFileType = text; name = options.gypi; path = ../../options.gypi; sourceTree = "<group>"; };
+		69663840867AD51514E537ED /* test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test; sourceTree = BUILT_PRODUCTS_DIR; };
+		8A72D3E7ACFC87E2FF268E3D /* test.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		01AA6DA0558FBADB76C637B5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		26E7AA11179FA27DB19D9625 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9992BBBF0498B54CE451063D /* libhttp_parser.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1E7C83CF76937897C1B1975F /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				7A01D21663D6ED57DEB40A13 /* . */,
+				8A72D3E7ACFC87E2FF268E3D /* test.c */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		4129389BAEB290C58DCE98BA = {
+			isa = PBXGroup;
+			children = (
+				1E7C83CF76937897C1B1975F /* Source */,
+				A69FD4B91748B6E639A454C6 /* Products */,
+				DB2C9E94332EFA3F6EDBD77F /* Build */,
+			);
+			sourceTree = "<group>";
+		};
+		7A01D21663D6ED57DEB40A13 /* . */ = {
+			isa = PBXGroup;
+			children = (
+				2D90D9ED4C02D0A63D926053 /* http_parser.c */,
+			);
+			path = .;
+			sourceTree = "<group>";
+		};
+		A69FD4B91748B6E639A454C6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1801301F7038583B51A4D241 /* libhttp_parser.a */,
+				69663840867AD51514E537ED /* test */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DB2C9E94332EFA3F6EDBD77F /* Build */ = {
+			isa = PBXGroup;
+			children = (
+				17695B4015753DD1DAD3B3D8 /* common.gypi */,
+				51B75EA9BC03495B89EBCAB2 /* http_parser.gyp */,
+				65CA71B46187CBCF5CC336F0 /* options.gypi */,
+			);
+			name = Build;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2C3D692EDB432A59FB72344A /* http_parser */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 79A40D195AF6AE1F0E8E41DB /* Build configuration list for PBXNativeTarget "http_parser" */;
+			buildPhases = (
+				95B8174A79C419155B98E354 /* Sources */,
+				01AA6DA0558FBADB76C637B5 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = http_parser;
+			productName = http_parser;
+			productReference = 1801301F7038583B51A4D241 /* libhttp_parser.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		954206F0294F950196E35C9F /* test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5BB6AE48B52CFACD48C8A350 /* Build configuration list for PBXNativeTarget "test" */;
+			buildPhases = (
+				65AB231ED94223A46ADD624C /* Sources */,
+				26E7AA11179FA27DB19D9625 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E6B40240AA1DB05C28B5CF65 /* PBXTargetDependency */,
+			);
+			name = test;
+			productName = test;
+			productReference = 69663840867AD51514E537ED /* test */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		556444191BAB19E0CEE666A6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+			};
+			buildConfigurationList = 2A732909C2A39816BD6A582A /* Build configuration list for PBXProject "http_parser" */;
+			compatibilityVersion = "Xcode 3.2";
+			hasScannedForEncodings = 1;
+			mainGroup = 4129389BAEB290C58DCE98BA;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BE5B788D75C6141F22FC2EA7 /* All */,
+				2C3D692EDB432A59FB72344A /* http_parser */,
+				954206F0294F950196E35C9F /* test */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		65AB231ED94223A46ADD624C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A66EC485F914B82E9A40556E /* test.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		95B8174A79C419155B98E354 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F4B3573D655B0E645CD501C /* http_parser.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		18B1B6AD61407C878B8D5ADE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2C3D692EDB432A59FB72344A /* http_parser */;
+			targetProxy = D1BCA596931897B1206BCDE7 /* PBXContainerItemProxy */;
+		};
+		E6B40240AA1DB05C28B5CF65 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2C3D692EDB432A59FB72344A /* http_parser */;
+			targetProxy = 3541BF622FB9E8B08B6A3121 /* PBXContainerItemProxy */;
+		};
+		ED6027DC36E18B8A1B49042C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 954206F0294F950196E35C9F /* test */;
+			targetProxy = FAC07E5833BA279D737464C2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		010FE7E4D6682C795BF9FB0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				EXECUTABLE_PREFIX = "";
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"\"DARWIN\"",
+					"\"DARWIN_10\"",
+					"\"_REENTRANT\"",
+					"\"DEBUG\"",
+					"\"_DEBUG\"",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_THREADSAFE_STATICS = NO;
+				GCC_VERSION = 4.2;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				HEADER_SEARCH_PATHS = .;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CFLAGS = "-fno-strict-aliasing";
+				OTHER_LDFLAGS = "-Wl,-search_paths_first";
+				PREBINDING = NO;
+				PRODUCT_NAME = test;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wendif-labels",
+					"-W",
+					"-Wno-unused-parameter",
+				);
+			};
+			name = Debug;
+		};
+		441F6FED719A9CEB3F60535B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				EXECUTABLE_PREFIX = lib;
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"\"DARWIN\"",
+					"\"DARWIN_10\"",
+					"\"_REENTRANT\"",
+					"\"HTTP_PARSER_STRICT=0\"",
+					"\"DEBUG\"",
+					"\"_DEBUG\"",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_THREADSAFE_STATICS = NO;
+				GCC_VERSION = 4.2;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				HEADER_SEARCH_PATHS = .;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CFLAGS = "-fno-strict-aliasing";
+				PREBINDING = NO;
+				PRODUCT_NAME = http_parser;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wendif-labels",
+					"-W",
+					"-Wno-unused-parameter",
+				);
+			};
+			name = Debug;
+		};
+		4B387EEBFCD74971DD42F366 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = All;
+			};
+			name = Debug;
+		};
+		6396A9BB92958EBCCD8353DA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = All;
+			};
+			name = Release;
+		};
+		65350F8CB20A0E5B593F9D55 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				EXECUTABLE_PREFIX = "";
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"\"DARWIN\"",
+					"\"DARWIN_10\"",
+					"\"_REENTRANT\"",
+					"\"NDEBUG\"",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_THREADSAFE_STATICS = NO;
+				GCC_VERSION = 4.2;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				HEADER_SEARCH_PATHS = .;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CFLAGS = "-fno-strict-aliasing";
+				OTHER_LDFLAGS = "-Wl,-search_paths_first";
+				PREBINDING = NO;
+				PRODUCT_NAME = test;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wendif-labels",
+					"-W",
+					"-Wno-unused-parameter",
+				);
+			};
+			name = Release;
+		};
+		6E9FDFF804D15C0AAF48EDD7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INTERMEDIATE_DIR = "$(PROJECT_DERIVED_FILE_DIR)/$(CONFIGURATION)";
+				SHARED_INTERMEDIATE_DIR = "$(SYMROOT)/DerivedSources/$(CONFIGURATION)";
+			};
+			name = Debug;
+		};
+		C5D83A4016954FE319667863 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INTERMEDIATE_DIR = "$(PROJECT_DERIVED_FILE_DIR)/$(CONFIGURATION)";
+				SHARED_INTERMEDIATE_DIR = "$(SYMROOT)/DerivedSources/$(CONFIGURATION)";
+			};
+			name = Release;
+		};
+		F9438AB1443F82ACFCF2A967 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				EXECUTABLE_PREFIX = lib;
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"\"DARWIN\"",
+					"\"DARWIN_10\"",
+					"\"_REENTRANT\"",
+					"\"HTTP_PARSER_STRICT=0\"",
+					"\"NDEBUG\"",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_THREADSAFE_STATICS = NO;
+				GCC_VERSION = 4.2;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				HEADER_SEARCH_PATHS = .;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CFLAGS = "-fno-strict-aliasing";
+				PREBINDING = NO;
+				PRODUCT_NAME = http_parser;
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wendif-labels",
+					"-W",
+					"-Wno-unused-parameter",
+				);
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2A732909C2A39816BD6A582A /* Build configuration list for PBXProject "http_parser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6E9FDFF804D15C0AAF48EDD7 /* Debug */,
+				C5D83A4016954FE319667863 /* Release */,
+			);
+			defaultConfigurationIsVisible = 1;
+			defaultConfigurationName = Debug;
+		};
+		3CEF0D2A59ADFC4BE87AC8FC /* Build configuration list for PBXAggregateTarget "All" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B387EEBFCD74971DD42F366 /* Debug */,
+				6396A9BB92958EBCCD8353DA /* Release */,
+			);
+			defaultConfigurationIsVisible = 1;
+			defaultConfigurationName = Debug;
+		};
+		5BB6AE48B52CFACD48C8A350 /* Build configuration list for PBXNativeTarget "test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				010FE7E4D6682C795BF9FB0D /* Debug */,
+				65350F8CB20A0E5B593F9D55 /* Release */,
+			);
+			defaultConfigurationIsVisible = 1;
+			defaultConfigurationName = Debug;
+		};
+		79A40D195AF6AE1F0E8E41DB /* Build configuration list for PBXNativeTarget "http_parser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				441F6FED719A9CEB3F60535B /* Debug */,
+				F9438AB1443F82ACFCF2A967 /* Release */,
+			);
+			defaultConfigurationIsVisible = 1;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 556444191BAB19E0CEE666A6 /* Project object */;
+}
