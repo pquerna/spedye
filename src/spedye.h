@@ -25,7 +25,17 @@ typedef struct spedye_conf_t {
   const char *keypath;
 } spedye_conf_t;
 
+typedef enum {
+  SPEDYE_STARTING,
+  SPEDYE_RUNNING,
+  SPEDYE_STOPING,
+  SPEDYE_STOPPED,
+} spedye_master_state;
+
 typedef struct spedye_master_t {
+  uv_thread_t master_thread;
+  uv_async_t master_wakeup;
+  spedye_master_state state;
   uv_loop_t *loop;
 } spedye_master_t;
 

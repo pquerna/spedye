@@ -4,15 +4,15 @@ Spedye is meant to handle all TLS/SSL traffic for a website -- it is based upon 
 
 Spedye aims to make adopting the SPDY protocol extremely easy for all kinds of websites.
 
-# STATUS: incomplete, prototype, etc
+# STATUS: incomplete, prototype, work in progress, non-functional, etc, etc
 
 
-## Features
+## Goals / Features
 
-
+* Built on top of [spdylay](https://github.com/tatsuhiro-t/spdylay).
 * SPDY version 2 and version 3
+* Multiple threads or processes each running their own libuv event loop to parallelize cryptographic operations across CPUs.
 * Server Name Indication: Support for multiple Certificates on a single listening address.
-
 
 ## Usage
 
