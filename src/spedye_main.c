@@ -35,6 +35,7 @@ process_args(spedye_conf_t *conf, int argc, char *argv[])
   for (i = 0; i < argc; i++) {
     printf("[%d] =  %s\n", i, argv[i]);
   }
+  conf->worker_count = 10;
   return 0;
 }
 

@@ -26,8 +26,7 @@ master_create_workers(spedye_master_t *m)
 {
   int i;
   for (i = 0; i < m->conf->worker_count; i++) {
-    spedye_worker_t *w = m->workers[i];
-    spedye_worker_create(&w, m);
+    spedye_worker_create(&m->workers[i], m);
   }
 }
 
@@ -48,6 +47,7 @@ master_destroy_workers(spedye_master_t *m)
   for (i = 0; i < m->conf->worker_count; i++) {
     spedye_worker_t *w = m->workers[i];
     spedye_worker_destroy(w);
+    m->workers[i] = NULL;
   }
 }
 
@@ -72,7 +72,7 @@ master_shutdown(uv_async_t* handle, int status)
   spedye_master_t *m = handle->data;
   m->state = SPEDYE_STOPING;
   master_destroy_workers(m);
-  uv_close((uv_handle_t*)&m->master_wakeup, master_shutdown_closecb);
+  uv_close((uv_handle_t*)handle, master_shutdown_closecb);
 }
 
 int

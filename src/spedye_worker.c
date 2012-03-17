@@ -29,7 +29,7 @@ worker_shutdown(uv_async_t* handle, int status)
 {
   spedye_worker_t *w = handle->data;
   w->state = SPEDYE_STOPING;
-  uv_close((uv_handle_t*)&w->worker_wakeup, worker_shutdown_closecb);
+  uv_close((uv_handle_t*)handle, worker_shutdown_closecb);
 }
 
 static void
@@ -55,7 +55,7 @@ spedye_worker_create(spedye_worker_t **w_out, spedye_master_t *m)
 
   rc = uv_async_init(w->loop, &w->worker_wakeup, worker_shutdown);
 
-  w->worker_wakeup.data = m;
+  w->worker_wakeup.data = w;
 
   *w_out = w;
 
