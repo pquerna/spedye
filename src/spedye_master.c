@@ -20,12 +20,50 @@
 #include <stdio.h>
 
 
+
+static void
+master_create_workers(spedye_master_t *m)
+{
+  int i;
+  for (i = 0; i < m->conf->worker_count; i++) {
+    spedye_worker_t *w = m->workers[i];
+    spedye_worker_create(&w, m);
+  }
+}
+
+static void
+master_start_workers(spedye_master_t *m)
+{
+  int i;
+  for (i = 0; i < m->conf->worker_count; i++) {
+    spedye_worker_t *w = m->workers[i];
+    spedye_worker_run(w);
+  }
+}
+
+static void
+master_destroy_workers(spedye_master_t *m)
+{
+  int i;
+  for (i = 0; i < m->conf->worker_count; i++) {
+    spedye_worker_t *w = m->workers[i];
+    spedye_worker_destroy(w);
+  }
+}
+
 static void
 master_entry(void* arg)
 {
   spedye_master_t *m = arg;
   m->state = SPEDYE_RUNNING;
-  fprintf(stderr, "%p\n", m);
+  master_start_workers(m);
+  uv_run(m->loop);
+}
+
+void master_shutdown_closecb(uv_handle_t* handle)
+{
+  spedye_master_t *m = handle->data;
+  uv_unref(m->loop);
 }
 
 static void
@@ -33,7 +71,8 @@ master_shutdown(uv_async_t* handle, int status)
 {
   spedye_master_t *m = handle->data;
   m->state = SPEDYE_STOPING;
-  m->master_wakeup.data = NULL;
+  master_destroy_workers(m);
+  uv_close((uv_handle_t*)&m->master_wakeup, master_shutdown_closecb);
 }
 
 int
@@ -47,11 +86,15 @@ spedye_master_create(spedye_master_t **m_out, spedye_conf_t *conf, uv_loop_t *lo
   m = calloc(1, sizeof(spedye_master_t));
   m->loop = loop;
   m->state = SPEDYE_STARTING;
+  m->conf = conf;
+  m->workers = calloc(conf->worker_count, sizeof(spedye_worker_t));
   uv_ref(m->loop);
 
   rc = uv_async_init(m->loop, &m->master_wakeup, master_shutdown);
 
   m->master_wakeup.data = m;
+
+  master_create_workers(m);
 
   *m_out = m;
 
@@ -75,7 +118,6 @@ spedye_master_destroy(spedye_master_t *m)
   uv_async_send(&m->master_wakeup);
   uv_thread_join(&m->master_thread);
   m->state = SPEDYE_STOPPED;
-  uv_unref(m->loop);
   free(m);
 }
 
