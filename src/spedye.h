@@ -56,6 +56,7 @@ struct spedye_listener_t {
   spedye_listener_t *next;
   /* Bellow here are owned by spedye core */
   SSL_CTX *sslctx;
+  uv_tcp_t* handle;
 };
 
 typedef struct spedye_conn_t {

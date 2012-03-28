@@ -51,6 +51,38 @@ master_destroy_workers(spedye_master_t *m)
   }
 }
 
+static int
+setup_listener(spedye_master_t *m, spedye_listener_t *lrec)
+{
+  struct sockaddr_in address;
+  lrec->handle = calloc(1, sizeof(uv_tcp_t));
+
+  uv_tcp_init(m->loop, lrec->handle);
+
+  address = uv_ip4_addr(lrec->address, lrec->port);
+
+  if (uv_tcp_bind(lrec->handle, address)) {
+    /* TODO: error handling */
+  }
+
+  return 0;
+}
+
+static int
+setup_listeners(spedye_master_t *m)
+{
+  int rv = 0;
+  spedye_listener_t *lrec;
+
+  for (lrec = m->conf->listeners;
+       rv == 0 && lrec != NULL;
+       lrec = lrec->next)
+  {
+    rv = setup_listener(m, lrec);
+  }
+  return rv;
+}
+
 static void
 master_entry(void* arg)
 {
