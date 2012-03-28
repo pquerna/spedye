@@ -43,9 +43,9 @@
     {
       'target_name': 'spdylay',
       'type': 'static_library',
-      'include_dirs': [ 'spdylay/lib', 'spdylay/lib/includes' ],
+      'include_dirs': [ 'spdylay/lib', 'spdylay/lib/includes', 'spdylay-configs' ],
       'direct_dependent_settings': {
-        'include_dirs': [ 'spdylay/lib/includes' ],
+        'include_dirs': [ 'spdylay/lib/includes', 'spdylay-configs' ],
       },
       'sources': [
         'spdylay/lib/spdylay_pq.c',
@@ -74,6 +74,7 @@
         'spdylay/lib/spdylay_npn.h',
         'spdylay/lib/spdylay_submit.h',
         'spdylay/lib/spdylay_outbound_item.h',
+        'spdylay/lib/spdylay_net.h'
       ],
       'conditions': [
         ['OS=="win"', {
