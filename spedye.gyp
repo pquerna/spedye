@@ -24,6 +24,7 @@
        'src/spedye_init.c',
        'src/spedye_master.c',
        'src/spedye_worker.c',
+       'src/spedye_conf.c',
      ],
      'include_dirs': [
        'src',

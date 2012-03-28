@@ -27,13 +27,50 @@
 
 #include "spedye.h"
 
+static int long_arg(const char *sname, const char *lname, int i, int argc, char *argv[], char **arg){
+  *arg = NULL;
+
+  if (strcmp(sname, argv[i]) == 0 ||
+      strcmp(lname, argv[i]) == 0)
+  {
+    if (i + 1 < argc) {
+      *arg =  argv[i+1];
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
 static int
 process_args(spedye_conf_t *conf, int argc, char *argv[])
 {
+  char *arg = NULL;
+  char *p = NULL;
   int i;
-  /* TODO: parse args */
+
+  /* TODO: support configuration file for complex configurations */
+
   for (i = 0; i < argc; i++) {
-    printf("[%d] =  %s\n", i, argv[i]);
+    if (long_arg("-b", "--bind", i, argc, argv, &arg)) {
+      i++;
+
+      p = strrchr(arg, ':');
+      if (p) {
+        conf->listeners->port = atoi(p+1);
+        *p = '\0';
+      }
+
+      if (strcmp("*", arg) == 0) {
+        conf->listeners->address = strdup("0.0.0.0");
+      }
+      else {
+        conf->listeners->address = strdup(arg);
+      }
+      /* TODO: proper parse IP:port, handle v6 */
+
+      continue;
+    }
   }
   conf->worker_count = 10;
   return 0;
@@ -42,15 +79,15 @@ process_args(spedye_conf_t *conf, int argc, char *argv[])
 int main(int argc, char *argv[])
 {
   int rv;
-  spedye_conf_t conf;
+  spedye_conf_t *conf;
   spedye_master_t *master;
   uv_loop_t *loop;
 
-  memset(&conf, 0, sizeof(spedye_conf_t));
-
   spedye_process_init();
 
-  rv = process_args(&conf, argc, argv);
+  rv = spedye_conf_create(&conf);
+
+  rv = process_args(conf, argc, argv);
 
   if (rv) {
     return rv;
@@ -58,7 +95,7 @@ int main(int argc, char *argv[])
 
   loop = uv_default_loop();
 
-  rv = spedye_master_create(&master, &conf, loop);
+  rv = spedye_master_create(&master, conf, loop);
 
   if (rv) {
     return rv;
@@ -67,11 +104,13 @@ int main(int argc, char *argv[])
   spedye_master_run(master);
 
   spedye_master_destroy(master);
-
   /* TOOD: spawn loops/other threads */
   /* TOOD: Create listeners */
   /* TOOD: handle HTTPS 1:1 -> HTTP */
   /* TODO: handle SPDY (m:n) -> HTTP*/
+
+  spedye_conf_destroy(conf);
+
   spedye_process_destroy();
 
   return 0;

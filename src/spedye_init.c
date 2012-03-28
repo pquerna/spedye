@@ -27,6 +27,12 @@
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 
+#if !USE_SYSTEM_SSL
+#if OPENSSL_VERSION_NUMBER != SPEDYE_OPENSSL_VERSION_NUMBER
+#error Invalid OpenSSL version number. Busted Include Paths?
+#endif
+#endif
+
 static uv_rwlock_t* locks;
 
 static unsigned long
