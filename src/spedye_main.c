@@ -68,9 +68,22 @@ process_args(spedye_conf_t *conf, int argc, char *argv[])
         conf->listeners->address = strdup(arg);
       }
       /* TODO: proper parse IP:port, handle v6 */
-
       continue;
     }
+
+    if (long_arg("-f", "--forward", i, argc, argv, &arg)) {
+      i++;
+
+      p = strrchr(arg, ':');
+
+      if (p) {
+        conf->listeners->vhosts->destport = atoi(p+1);
+        *p = '\0';
+      }
+
+      conf->listeners->vhosts->destaddress = strdup(arg);
+    }
+
   }
   conf->worker_count = 10;
   return 0;

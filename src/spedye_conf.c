@@ -23,6 +23,7 @@ init_blank_config(spedye_conf_t *conf)
   spedye_vhost_t *vhost = calloc(1, sizeof(spedye_vhost_t));
   spedye_listener_t *lrec = calloc(1, sizeof(spedye_listener_t));
   conf->listeners = lrec;
+  vhost->destport = 80;
   lrec->port = 443;
   lrec->vhosts = vhost;
 }
