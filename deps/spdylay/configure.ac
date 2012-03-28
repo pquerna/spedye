@@ -21,13 +21,18 @@ dnl LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 dnl OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 dnl WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 AC_PREREQ(2.61)
-LT_PREREQ([2.2.6])
 AC_INIT([spdylay], [0.1.0], [t-tujikawa@users.sourceforge.net])
+LT_PREREQ([2.2.6])
+LT_INIT()
 dnl See versioning rule:
 dnl  http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 AC_SUBST(LT_CURRENT, 0)
 AC_SUBST(LT_REVISION, 0)
 AC_SUBST(LT_AGE, 0)
+
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -37,7 +42,6 @@ AC_CONFIG_HEADERS([config.h])
 dnl Checks for programs
 AC_PROG_CC
 AC_PROG_CXX
-AM_PROG_LIBTOOL
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -89,6 +93,7 @@ PKG_CHECK_MODULES([OPENSSL], [openssl >= 1.0.1])
 # Checks for header files.
 AC_CHECK_HEADERS([ \
   arpa/inet.h \
+  netinet/in.h \
   stddef.h \
   stdint.h \
   stdlib.h \
@@ -108,7 +113,9 @@ AC_CHECK_TYPES([ptrdiff_t])
 AC_C_BIGENDIAN
 
 # Checks for library functions.
-AC_FUNC_MALLOC
+if test "x$cross_compiling" != "xyes"; then
+  AC_FUNC_MALLOC
+fi
 AC_CHECK_FUNCS([ \
   memmove \
   memset \

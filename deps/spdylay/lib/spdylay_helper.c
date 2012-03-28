@@ -25,7 +25,8 @@
 #include "spdylay_helper.h"
 
 #include <string.h>
-#include <arpa/inet.h>
+
+#include "spdylay_net.h"
 
 void spdylay_put_uint16be(uint8_t *buf, uint16_t n)
 {
@@ -57,8 +58,9 @@ int spdylay_reserve_buffer(uint8_t **buf_ptr, size_t *buflen_ptr,
                            size_t min_length)
 {
   if(min_length > *buflen_ptr) {
+    uint8_t *temp;
     min_length = (min_length+4095)/4096*4096;
-    uint8_t *temp = malloc(min_length);
+    temp = malloc(min_length);
     if(temp == NULL) {
       return SPDYLAY_ERR_NOMEM;
     } else {

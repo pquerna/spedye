@@ -36,10 +36,11 @@ static const char *headers[] = {
   "x-head", "foo",
   "x-head", "bar",
   "version", "HTTP/1.1",
+  "empty", "",
   NULL
 };
 
-void test_spdylay_frame_unpack_nv_with(size_t len_size)
+static void test_spdylay_frame_unpack_nv_with(size_t len_size)
 {
   uint8_t out[1024];
   char **nv;
@@ -57,20 +58,31 @@ void test_spdylay_frame_unpack_nv_with(size_t len_size)
   CU_ASSERT(strcmp("bar", nv[9]) == 0);
   CU_ASSERT(strcmp("version", nv[10]) == 0);
   CU_ASSERT(strcmp("HTTP/1.1", nv[11]) == 0);
+  CU_ASSERT(strcmp("empty", nv[12]) == 0);
+  CU_ASSERT(strcmp("", nv[13]) == 0);
   spdylay_frame_nv_del(nv);
+
+  /* Create in-sequence NUL bytes */
+  memcpy(&out[len_size+len_size+strlen(headers[0])+len_size+
+              strlen(headers[1])-2],
+         "\0\0", 2);
+  CU_ASSERT(SPDYLAY_ERR_INVALID_HEADER_BLOCK ==
+            spdylay_frame_unpack_nv(&nv, out, inlen, len_size));
 }
 
-void test_spdylay_frame_unpack_nv_spdy2()
+void test_spdylay_frame_unpack_nv_spdy2(void)
 {
-  test_spdylay_frame_unpack_nv_with(2);
+  test_spdylay_frame_unpack_nv_with
+    (spdylay_frame_get_len_size(SPDYLAY_PROTO_SPDY2));
 }
 
-void test_spdylay_frame_unpack_nv_spdy3()
+void test_spdylay_frame_unpack_nv_spdy3(void)
 {
-  test_spdylay_frame_unpack_nv_with(4);
+  test_spdylay_frame_unpack_nv_with
+    (spdylay_frame_get_len_size(SPDYLAY_PROTO_SPDY2));
 }
 
-void test_spdylay_frame_pack_nv_duplicate_keys()
+void test_spdylay_frame_pack_nv_duplicate_keys(void)
 {
   uint8_t out[1024];
   size_t len_size = 2;
@@ -84,13 +96,16 @@ void test_spdylay_frame_pack_nv_duplicate_keys()
     NULL
   };
   char **nv = spdylay_frame_nv_norm_copy(nv_src);
+  const uint8_t *outptr;
+  int pairs, len;
   /* size_t inlen = */ spdylay_frame_pack_nv(out, nv, len_size);
-  const uint8_t *outptr = out;
-  int pairs = spdylay_get_uint16(outptr);
+  outptr = out;
+
+  pairs = spdylay_get_uint16(outptr);
   CU_ASSERT(pairs == 5);
   outptr += 2;
 
-  int len = spdylay_get_uint16(outptr);
+  len = spdylay_get_uint16(outptr);
   outptr += 2;
   CU_ASSERT(len == 6);
   CU_ASSERT(memcmp(outptr, "method", len) == 0);
@@ -154,25 +169,27 @@ void test_spdylay_frame_pack_nv_duplicate_keys()
   spdylay_frame_nv_del(nv);
 }
 
-void test_spdylay_frame_count_nv_space()
+void test_spdylay_frame_count_nv_space(void)
 {
   size_t len_size = 2;
-  CU_ASSERT(74 == spdylay_frame_count_nv_space((char**)headers, len_size));
+  CU_ASSERT(83 == spdylay_frame_count_nv_space((char**)headers, len_size));
   len_size = 4;
-  CU_ASSERT(96 == spdylay_frame_count_nv_space((char**)headers, len_size));
+  CU_ASSERT(109 == spdylay_frame_count_nv_space((char**)headers, len_size));
 }
 
-void test_spdylay_frame_count_unpack_nv_space()
+void test_spdylay_frame_count_unpack_nv_space(void)
 {
   size_t nvlen, buflen;
   uint8_t out[1024];
   size_t len_size = 2;
   size_t inlen = spdylay_frame_pack_nv(out, (char**)headers, len_size);
   uint16_t temp;
+  size_t expected_buflen;
   CU_ASSERT(0 == spdylay_frame_count_unpack_nv_space(&nvlen, &buflen,
                                                      out, inlen, len_size));
-  CU_ASSERT(6 == nvlen);
-  CU_ASSERT(166 == buflen);
+  CU_ASSERT(7 == nvlen);
+  expected_buflen = 69+(nvlen*2+1)*sizeof(char*);
+  CU_ASSERT(expected_buflen == buflen);
 
   /* Trailing garbage */
   CU_ASSERT(SPDYLAY_ERR_INVALID_FRAME ==
@@ -199,7 +216,7 @@ void test_spdylay_frame_count_unpack_nv_space()
                                                 len_size));
 }
 
-void test_spdylay_frame_pack_ping()
+void test_spdylay_frame_pack_ping(void)
 {
   spdylay_frame frame, oframe;
   uint8_t *buf = NULL;
@@ -218,7 +235,7 @@ void test_spdylay_frame_pack_ping()
   spdylay_frame_ping_free(&frame.ping);
 }
 
-void test_spdylay_frame_pack_goaway_version(uint16_t version)
+static void test_spdylay_frame_pack_goaway_version(uint16_t version)
 {
   spdylay_frame frame, oframe;
   uint8_t *buf = NULL;
@@ -248,17 +265,17 @@ void test_spdylay_frame_pack_goaway_version(uint16_t version)
   spdylay_frame_goaway_free(&frame.goaway);
 }
 
-void test_spdylay_frame_pack_goaway_spdy2()
+void test_spdylay_frame_pack_goaway_spdy2(void)
 {
   test_spdylay_frame_pack_goaway_version(SPDYLAY_PROTO_SPDY2);
 }
 
-void test_spdylay_frame_pack_goaway_spdy3()
+void test_spdylay_frame_pack_goaway_spdy3(void)
 {
   test_spdylay_frame_pack_goaway_version(SPDYLAY_PROTO_SPDY3);
 }
 
-void test_spdylay_frame_pack_syn_stream_version(uint16_t version)
+static void test_spdylay_frame_pack_syn_stream_version(uint16_t version)
 {
   spdylay_zlib deflater, inflater;
   spdylay_frame frame, oframe;
@@ -291,7 +308,7 @@ void test_spdylay_frame_pack_syn_stream_version(uint16_t version)
   CU_ASSERT(framelen-SPDYLAY_FRAME_HEAD_LENGTH == oframe.ping.hd.length);
   CU_ASSERT(strcmp("method", oframe.syn_stream.nv[0]) == 0);
   CU_ASSERT(strcmp("GET", oframe.syn_stream.nv[1]) == 0);
-  CU_ASSERT(NULL == oframe.syn_stream.nv[12]);
+  CU_ASSERT(NULL == oframe.syn_stream.nv[14]);
   free(buf);
   free(nvbuf);
   spdylay_frame_syn_stream_free(&oframe.syn_stream);
@@ -301,17 +318,17 @@ void test_spdylay_frame_pack_syn_stream_version(uint16_t version)
   spdylay_buffer_free(&inflatebuf);
 }
 
-void test_spdylay_frame_pack_syn_stream_spdy2()
+void test_spdylay_frame_pack_syn_stream_spdy2(void)
 {
   test_spdylay_frame_pack_syn_stream_version(SPDYLAY_PROTO_SPDY2);
 }
 
-void test_spdylay_frame_pack_syn_stream_spdy3()
+void test_spdylay_frame_pack_syn_stream_spdy3(void)
 {
   test_spdylay_frame_pack_syn_stream_version(SPDYLAY_PROTO_SPDY3);
 }
 
-void test_spdylay_frame_pack_syn_reply_version(uint16_t version)
+static void test_spdylay_frame_pack_syn_reply_version(uint16_t version)
 {
   spdylay_zlib deflater, inflater;
   spdylay_frame frame, oframe;
@@ -343,7 +360,7 @@ void test_spdylay_frame_pack_syn_reply_version(uint16_t version)
   CU_ASSERT(framelen-SPDYLAY_FRAME_HEAD_LENGTH == oframe.ping.hd.length);
   CU_ASSERT(strcmp("method", oframe.syn_reply.nv[0]) == 0);
   CU_ASSERT(strcmp("GET", oframe.syn_reply.nv[1]) == 0);
-  CU_ASSERT(NULL == oframe.syn_reply.nv[12]);
+  CU_ASSERT(NULL == oframe.syn_reply.nv[14]);
   free(buf);
   free(nvbuf);
   spdylay_frame_syn_reply_free(&oframe.syn_reply);
@@ -353,17 +370,17 @@ void test_spdylay_frame_pack_syn_reply_version(uint16_t version)
   spdylay_buffer_free(&inflatebuf);
 }
 
-void test_spdylay_frame_pack_syn_reply_spdy2()
+void test_spdylay_frame_pack_syn_reply_spdy2(void)
 {
   test_spdylay_frame_pack_syn_reply_version(SPDYLAY_PROTO_SPDY2);
 }
 
-void test_spdylay_frame_pack_syn_reply_spdy3()
+void test_spdylay_frame_pack_syn_reply_spdy3(void)
 {
   test_spdylay_frame_pack_syn_reply_version(SPDYLAY_PROTO_SPDY3);
 }
 
-void test_spdylay_frame_pack_headers_version(uint16_t version)
+static void test_spdylay_frame_pack_headers_version(uint16_t version)
 {
   spdylay_zlib deflater, inflater;
   spdylay_frame frame, oframe;
@@ -395,7 +412,7 @@ void test_spdylay_frame_pack_headers_version(uint16_t version)
   CU_ASSERT(framelen-SPDYLAY_FRAME_HEAD_LENGTH == oframe.ping.hd.length);
   CU_ASSERT(strcmp("method", oframe.headers.nv[0]) == 0);
   CU_ASSERT(strcmp("GET", oframe.headers.nv[1]) == 0);
-  CU_ASSERT(NULL == oframe.headers.nv[12]);
+  CU_ASSERT(NULL == oframe.headers.nv[14]);
   free(buf);
   free(nvbuf);
   spdylay_frame_headers_free(&oframe.headers);
@@ -405,17 +422,17 @@ void test_spdylay_frame_pack_headers_version(uint16_t version)
   spdylay_buffer_free(&inflatebuf);
 }
 
-void test_spdylay_frame_pack_headers_spdy2()
+void test_spdylay_frame_pack_headers_spdy2(void)
 {
   test_spdylay_frame_pack_headers_version(SPDYLAY_PROTO_SPDY2);
 }
 
-void test_spdylay_frame_pack_headers_spdy3()
+void test_spdylay_frame_pack_headers_spdy3(void)
 {
   test_spdylay_frame_pack_headers_version(SPDYLAY_PROTO_SPDY3);
 }
 
-void test_spdylay_frame_pack_window_update()
+void test_spdylay_frame_pack_window_update(void)
 {
   spdylay_frame frame, oframe;
   uint8_t *buf = NULL;
@@ -442,7 +459,7 @@ void test_spdylay_frame_pack_window_update()
 }
 
 
-void test_spdylay_frame_pack_settings_version(uint16_t version)
+static void test_spdylay_frame_pack_settings_version(uint16_t version)
 {
   spdylay_frame frame, oframe;
   uint8_t *buf = NULL;
@@ -489,17 +506,17 @@ void test_spdylay_frame_pack_settings_version(uint16_t version)
   spdylay_frame_settings_free(&oframe.settings);
 }
 
-void test_spdylay_frame_pack_settings_spdy2()
+void test_spdylay_frame_pack_settings_spdy2(void)
 {
   test_spdylay_frame_pack_settings_version(SPDYLAY_PROTO_SPDY2);
 }
 
-void test_spdylay_frame_pack_settings_spdy3()
+void test_spdylay_frame_pack_settings_spdy3(void)
 {
   test_spdylay_frame_pack_settings_version(SPDYLAY_PROTO_SPDY3);
 }
 
-void test_spdylay_frame_nv_sort()
+void test_spdylay_frame_nv_sort(void)
 {
   char *nv[7];
   nv[0] = (char*)"version";
@@ -518,7 +535,7 @@ void test_spdylay_frame_nv_sort()
   CU_ASSERT(strcmp("HTTP/1.1", nv[5]) == 0);
 }
 
-void test_spdylay_frame_nv_downcase()
+void test_spdylay_frame_nv_downcase(void)
 {
   const char *nv_src[] = {
     "VERSION", "HTTP/1.1",
@@ -535,7 +552,7 @@ void test_spdylay_frame_nv_downcase()
   spdylay_frame_nv_del(nv);
 }
 
-void test_spdylay_frame_nv_2to3()
+void test_spdylay_frame_nv_2to3(void)
 {
   const char *nv_src[] = {
     "host", "localhost",
@@ -560,7 +577,7 @@ void test_spdylay_frame_nv_2to3()
   spdylay_frame_nv_del(nv);
 }
 
-void test_spdylay_frame_nv_3to2()
+void test_spdylay_frame_nv_3to2(void)
 {
   const char *nv_src[] = {
     ":host", "localhost",
@@ -583,4 +600,72 @@ void test_spdylay_frame_nv_3to2()
   CU_ASSERT(0 == strcmp("status", nv[10]));
   CU_ASSERT(0 == strcmp("version", nv[12]));
   spdylay_frame_nv_del(nv);
+}
+
+static size_t spdylay_pack_nv(uint8_t *buf, size_t len, const char **nv,
+                              size_t len_size)
+{
+  size_t i, n;
+  uint8_t *buf_ptr;
+  buf_ptr = buf;
+  for(n = 0; nv[n]; ++n);
+  spdylay_frame_put_nv_len(buf_ptr, n/2, len_size);
+  buf_ptr += len_size;
+  for(i = 0; i < n; ++i) {
+    size_t len = strlen(nv[i]);
+    spdylay_frame_put_nv_len(buf_ptr, len, len_size);
+    buf_ptr += len_size;
+    memcpy(buf_ptr, nv[i], len);
+    buf_ptr += len;
+  }
+  return buf_ptr-buf;
+}
+
+static const char *empty_name_headers[] = {
+  "method", "GET",
+  "", "https",
+  "url", "/",
+  NULL
+};
+
+static const char non_ascii_header_name[] = { (char)0xff };
+
+static const char *non_ascii_headers[] = {
+  non_ascii_header_name, "foo",
+  NULL
+};
+
+static void test_spdylay_frame_unpack_nv_check_name_with(size_t len_size)
+{
+  uint8_t nvbuf[1024], buf[1024];
+  size_t nvbuflen;
+
+  nvbuflen = spdylay_pack_nv(nvbuf, sizeof(nvbuf), headers, len_size);
+  CU_ASSERT(SPDYLAY_ERR_INVALID_HEADER_BLOCK ==
+            spdylay_frame_unpack_nv_check_name(buf, sizeof(buf),
+                                               nvbuf, nvbuflen, len_size));
+
+  nvbuflen = spdylay_pack_nv(nvbuf, sizeof(nvbuf), empty_name_headers,
+                             len_size);
+  CU_ASSERT(SPDYLAY_ERR_INVALID_HEADER_BLOCK ==
+            spdylay_frame_unpack_nv_check_name(buf, sizeof(buf),
+                                               nvbuf, nvbuflen, len_size));
+
+  nvbuflen = spdylay_pack_nv(nvbuf, sizeof(nvbuf), non_ascii_headers,
+                             len_size);
+  CU_ASSERT(SPDYLAY_ERR_INVALID_HEADER_BLOCK ==
+            spdylay_frame_unpack_nv_check_name(buf, sizeof(buf),
+                                               nvbuf, nvbuflen, len_size));
+}
+
+void test_spdylay_frame_unpack_nv_check_name_spdy2(void)
+{
+  test_spdylay_frame_unpack_nv_check_name_with
+    (spdylay_frame_get_len_size(SPDYLAY_PROTO_SPDY2));
+}
+
+void test_spdylay_frame_unpack_nv_check_name_spdy3(void)
+{
+  test_spdylay_frame_unpack_nv_check_name_with
+    (spdylay_frame_get_len_size(SPDYLAY_PROTO_SPDY3));
 }

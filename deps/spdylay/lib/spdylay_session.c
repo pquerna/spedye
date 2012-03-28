@@ -28,9 +28,9 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <assert.h>
-#include <arpa/inet.h>
 
 #include "spdylay_helper.h"
+#include "spdylay_net.h"
 
 /*
  * Returns non-zero if the number of opened streams is larger than or
@@ -475,7 +475,7 @@ void spdylay_session_close_pushed_streams(spdylay_session *session,
   spdylay_stream *stream;
   stream = spdylay_session_get_stream(session, stream_id);
   if(stream) {
-    int i;
+    size_t i;
     for(i = 0; i < stream->pushed_streams_length; ++i) {
       spdylay_session_close_stream(session, stream->pushed_streams[i],
                                    status_code);
@@ -1290,7 +1290,7 @@ static ssize_t spdylay_recv(spdylay_session *session, uint8_t *buf, size_t len)
   r = session->callbacks.recv_callback
     (session, buf, len, 0, session->user_data);
   if(r > 0) {
-    if(r > len) {
+    if((size_t)r > len) {
       return SPDYLAY_ERR_CALLBACK_FAILURE;
     }
   } else if(r < 0) {
@@ -1346,25 +1346,6 @@ static int spdylay_session_check_version(spdylay_session *session,
 }
 
 /*
- * Returns non-zero iff name/value pairs |nv| are good shape.
- * Currently, we only checks whether names are lower cased. The spdy/2
- * spec requires that names must be lower cased.
- */
-static int spdylay_session_check_nv(char **nv)
-{
-  int i;
-  for(i = 0; nv[i]; i += 2) {
-    int j;
-    for(j = 0; nv[i][j] != '\0'; ++j) {
-      if('A' <= nv[i][j] && nv[i][j] <= 'Z') {
-        return 0;
-      }
-    }
-  }
-  return 1;
-}
-
-/*
  * Validates SYN_STREAM frame |frame|.  This function returns 0 if it
  * succeeds, or non-zero spdylay_status_code.
  */
@@ -1399,9 +1380,6 @@ static int spdylay_session_validate_syn_stream(spdylay_session *session,
        SPDYLAY_REFUSED_STREAM and we think it is reasonable. So we
        follow it. */
     return SPDYLAY_REFUSED_STREAM;
-  }
-  if(!spdylay_session_check_nv(frame->nv)) {
-    return SPDYLAY_PROTOCOL_ERROR;
   }
   return 0;
 }
@@ -1519,8 +1497,7 @@ int spdylay_session_on_syn_reply_received(spdylay_session *session,
   }
   if((stream = spdylay_session_get_stream(session,
                                           frame->syn_reply.stream_id)) &&
-     (stream->shut_flags & SPDYLAY_SHUT_RD) == 0 &&
-     spdylay_session_check_nv(frame->syn_reply.nv)) {
+     (stream->shut_flags & SPDYLAY_SHUT_RD) == 0) {
     if(spdylay_session_is_my_stream_id(session, frame->syn_reply.stream_id)) {
       if(stream->state == SPDYLAY_STREAM_OPENING) {
         valid = 1;
@@ -1602,7 +1579,7 @@ void spdylay_session_update_local_settings(spdylay_session *session,
                                            spdylay_settings_entry *iv,
                                            size_t niv)
 {
-  int i;
+  size_t i;
   for(i = 0; i < niv; ++i) {
     assert(iv[i].settings_id > 0 && iv[i].settings_id <= SPDYLAY_SETTINGS_MAX);
     session->local_settings[iv[i].settings_id] = iv[i].value;
@@ -1612,7 +1589,8 @@ void spdylay_session_update_local_settings(spdylay_session *session,
 int spdylay_session_on_settings_received(spdylay_session *session,
                                          spdylay_frame *frame)
 {
-  int i, check[SPDYLAY_SETTINGS_MAX+1];
+  size_t i;
+  int check[SPDYLAY_SETTINGS_MAX+1];
   if(!spdylay_session_check_version(session, frame->settings.hd.version)) {
     return 0;
   }
@@ -1727,8 +1705,7 @@ int spdylay_session_on_headers_received(spdylay_session *session,
   }
   if((stream = spdylay_session_get_stream(session,
                                           frame->headers.stream_id)) &&
-     (stream->shut_flags & SPDYLAY_SHUT_RD) == 0 &&
-     spdylay_session_check_nv(frame->headers.nv)) {
+     (stream->shut_flags & SPDYLAY_SHUT_RD) == 0) {
     if(spdylay_session_is_my_stream_id(session, frame->headers.stream_id)) {
       if(stream->state == SPDYLAY_STREAM_OPENED) {
         valid = 1;
@@ -1799,6 +1776,11 @@ static int spdylay_session_process_ctrl_frame(spdylay_session *session)
       /* TODO if r indicates mulformed NV pairs (multiple nulls) or
          invalid frame, send RST_STREAM with PROTOCOL_ERROR. Same for
          other control frames. */
+    } else if(r == SPDYLAY_ERR_INVALID_HEADER_BLOCK) {
+      r = spdylay_session_handle_invalid_stream
+        (session, frame.syn_stream.stream_id, SPDYLAY_SYN_STREAM, &frame,
+         SPDYLAY_PROTOCOL_ERROR);
+      spdylay_frame_syn_stream_free(&frame.syn_stream);
     } else if(spdylay_is_non_fatal(r)) {
       r = spdylay_session_fail_session(session, SPDYLAY_GOAWAY_PROTOCOL_ERROR);
     }
@@ -1819,6 +1801,11 @@ static int spdylay_session_process_ctrl_frame(spdylay_session *session)
         spdylay_frame_nv_2to3(frame.syn_reply.nv);
       }
       r = spdylay_session_on_syn_reply_received(session, &frame);
+      spdylay_frame_syn_reply_free(&frame.syn_reply);
+    } else if(r == SPDYLAY_ERR_INVALID_HEADER_BLOCK) {
+      r = spdylay_session_handle_invalid_stream
+        (session, frame.syn_reply.stream_id, SPDYLAY_SYN_REPLY, &frame,
+         SPDYLAY_PROTOCOL_ERROR);
       spdylay_frame_syn_reply_free(&frame.syn_reply);
     } else if(spdylay_is_non_fatal(r)) {
       r = spdylay_session_fail_session(session, SPDYLAY_GOAWAY_PROTOCOL_ERROR);
@@ -1894,6 +1881,11 @@ static int spdylay_session_process_ctrl_frame(spdylay_session *session)
         spdylay_frame_nv_2to3(frame.headers.nv);
       }
       r = spdylay_session_on_headers_received(session, &frame);
+      spdylay_frame_headers_free(&frame.headers);
+    } else if(r == SPDYLAY_ERR_INVALID_HEADER_BLOCK) {
+      r = spdylay_session_handle_invalid_stream
+        (session, frame.headers.stream_id, SPDYLAY_HEADERS, &frame,
+         SPDYLAY_PROTOCOL_ERROR);
       spdylay_frame_headers_free(&frame.headers);
     } else if(spdylay_is_non_fatal(r)) {
       r = spdylay_session_fail_session(session, SPDYLAY_GOAWAY_PROTOCOL_ERROR);
@@ -2011,7 +2003,7 @@ static int spdylay_session_update_recv_window_size(spdylay_session *session,
   if(stream) {
     stream->recv_window_size += delta_size;
     /* This is just a heuristics. */
-    if(stream->recv_window_size*2 >=
+    if((size_t)stream->recv_window_size*2 >=
        session->remote_settings[SPDYLAY_SETTINGS_INITIAL_WINDOW_SIZE]) {
       int r;
       r = spdylay_session_add_window_update(session, stream_id,
@@ -2267,7 +2259,7 @@ ssize_t spdylay_session_pack_data(spdylay_session *session,
      &eof, &frame->data_prd.source, session->user_data);
   if(r < 0) {
     return r;
-  } else if(datamax < r) {
+  } else if(datamax < (size_t)r) {
     return SPDYLAY_ERR_CALLBACK_FAILURE;
   }
   memset(*buf_ptr, 0, SPDYLAY_HEAD_LEN);
@@ -2330,9 +2322,9 @@ int spdylay_session_resume_data(spdylay_session *session, int32_t stream_id)
 uint8_t spdylay_session_get_pri_lowest(spdylay_session *session)
 {
   if(session->version == SPDYLAY_PROTO_SPDY2) {
-    return SPDYLAY_SPDY2_PRI_LOWEST;
+    return SPDYLAY_PRI_LOWEST_SPDY2;
   } else if(session->version == SPDYLAY_PROTO_SPDY3) {
-    return SPDYLAY_SPDY3_PRI_LOWEST;
+    return SPDYLAY_PRI_LOWEST_SPDY3;
   } else {
     return 0;
   }

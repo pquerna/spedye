@@ -22,9 +22,19 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef SPDYLAY_QUEUE_TEST_H
-#define SPDYLAY_QUEUE_TEST_H
+#ifndef SPDYLAY_NET_H
+#define SPDYLAY_NET_H
 
-void test_spdylay_queue(void);
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif /* HAVE_CONFIG_H */
 
-#endif /* SPDYLAY_QUEUE_TEST_H */
+#ifdef HAVE_ARPA_INET_H
+#  include <arpa/inet.h>
+#endif /* HAVE_ARPA_INET_H */
+
+#ifdef HAVE_NETINET_IN_H
+#  include <netinet/in.h>
+#endif /* HAVE_NETINET_IN_H */
+
+#endif /* SPDYLAY_NET_H */

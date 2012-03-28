@@ -46,17 +46,20 @@ struct spdylay_session;
 typedef struct spdylay_session spdylay_session;
 
 /**
- * @macro
+ * @enum
  *
- * SPDY protocol version 2
+ * The SPDY protocol version.
  */
-#define SPDYLAY_PROTO_SPDY2 2
-/**
- * @macro
- *
- * SPDY protocol version 3
- */
-#define SPDYLAY_PROTO_SPDY3 3
+typedef enum {
+  /**
+   * SPDY protocol version 2
+   */
+  SPDYLAY_PROTO_SPDY2 = 2,
+  /**
+   * SPDY protocol version 3
+   */
+  SPDYLAY_PROTO_SPDY3 = 3
+} spdylay_proto_version;
 
 /**
  * @enum
@@ -144,6 +147,14 @@ typedef enum {
    */
   SPDYLAY_ERR_GOAWAY_ALREADY_SENT = -517,
   /**
+   * The received frame contains the invalid header block. (e.g.,
+   * There are duplicate header names; or the header names are not
+   * encoded in US-ASCII character set and not lower cased; or the
+   * header name is zero-length string; or the header value contains
+   * multiple in-sequence NUL bytes).
+   */
+  SPDYLAY_ERR_INVALID_HEADER_BLOCK = -518,
+  /**
    * The errors < :enum:`SPDYLAY_ERR_FATAL` mean that the library is
    * under unexpected condition and cannot process any further data
    * reliably (e.g., out of memory).
@@ -156,7 +167,7 @@ typedef enum {
   /**
    * The user callback function failed. This is a fatal error.
    */
-  SPDYLAY_ERR_CALLBACK_FAILURE = -902,
+  SPDYLAY_ERR_CALLBACK_FAILURE = -902
 } spdylay_error;
 
 typedef enum {
@@ -207,7 +218,7 @@ typedef enum {
   /**
    * The DATA frame.
    */
-  SPDYLAY_DATA = 100,
+  SPDYLAY_DATA = 100
 } spdylay_frame_type;
 
 /**
@@ -408,17 +419,6 @@ typedef enum {
 } spdylay_goaway_status_code;
 
 /**
- * @macro
- * Lowest priority value in SPDY/2, which is 3.
- */
-#define SPDYLAY_SPDY2_PRI_LOWEST 3
-/**
- * @macro
- * Lowest priority value in SPDY/3, which is 7.
- */
-#define SPDYLAY_SPDY3_PRI_LOWEST 7
-
-/**
  * @struct
  * The control frame header.
  */
@@ -460,10 +460,9 @@ typedef struct {
    */
   int32_t assoc_stream_id;
   /**
-   * The priority of this frame. 0 (Highest) to
-   * :macro:`SPDYLAY_SPDY2_PRI_LOWEST` or
-   * :macro:`SPDYLAY_SPDY3_PRI_LOWEST` (lowest), depending on the
-   * protocol version.
+   * The priority of this frame. 0 is the highest priority value. Use
+   * `spdylay_session_get_pri_lowest()` to know the lowest priority
+   * value.
    */
   uint8_t pri;
   /**
@@ -983,10 +982,10 @@ typedef struct {
  * |callbacks|. |user_data| is an arbitrary user supplied data, which
  * will be passed to the callback functions.
  *
- * Some of the members of |callbacks| can be ``NULL``, but
- * :member:`spdylay_session_callbacks.send_callback` and
- * :member:`spdylay_session_callbacks.recv_callback` must be
- * specified.
+ * The :member:`spdylay_session_callbacks.send_callback` must be
+ * specified.  If the application code uses `spdylay_session_recv()`,
+ * the :member:`spdylay_session_callbacks.recv_callback` must be
+ * specified. The other members of |callbacks| can be ``NULL``.
  *
  * This function returns 0 if it succeeds, or one of the following
  * negative error codes:
@@ -1012,10 +1011,10 @@ int spdylay_session_client_new(spdylay_session **session_ptr,
  * |callbacks|. |user_data| is an arbitrary user supplied data, which
  * will be passed to the callback functions.
  *
- * Some of the members of |callbacks| can be ``NULL``, but
- * :member:`spdylay_session_callbacks.send_callback` and
- * :member:`spdylay_session_callbacks.recv_callback` must be
- * specified.
+ * The :member:`spdylay_session_callbacks.send_callback` must be
+ * specified.  If the application code uses `spdylay_session_recv()`,
+ * the :member:`spdylay_session_callbacks.recv_callback` must be
+ * specified. The other members of |callbacks| can be ``NULL``.
  *
  * This function returns 0 if it succeeds, or one of the following
  * negative error codes:
@@ -1235,15 +1234,19 @@ size_t spdylay_session_get_outbound_queue_size(spdylay_session *session);
 /**
  * @function
  *
+ * Returns lowest priority value for the |session|.
+ */
+uint8_t spdylay_session_get_pri_lowest(spdylay_session *session);
+
+/**
+ * @function
+ *
  * Submits SYN_STREAM frame and optionally one or more DATA
  * frames.
  *
  * The |pri| is priority of this request. 0 is the highest priority
- * value.  If the |session| is initialized with the version
- * :macro:`SPDYLAY_PROTO_SPDY2`, the lowest priority value is
- * :macro:`SPDYLAY_SPDY2_PRI_LOWEST`.  If the |session| is initialized
- * with the version :macro:`SPDYLAY_PROTO_SPDY3`, the lowest priority
- * value is :macro:`SPDYLAY_SPDY3_PRI_LOWEST`.
+ * value. Use `spdylay_session_get_pri_lowest()` to know the lowest
+ * priority value for this |session|.
  *
  * The |nv| contains the name/value pairs. For i > 0, ``nv[2*i]``
  * contains a pointer to the name string and ``nv[2*i+1]`` contains a
@@ -1364,13 +1367,10 @@ int spdylay_submit_response(spdylay_session *session,
  *
  * The |assoc_stream_id| is used for server-push. If |session| is
  * initialized for client use, |assoc_stream_id| is ignored.
-
+ *
  * The |pri| is priority of this request. 0 is the highest priority
- * value.  If the |session| is initialized with the version
- * :macro:`SPDYLAY_PROTO_SPDY2`, the lowest priority value is
- * :macro:`SPDYLAY_SPDY2_PRI_LOWEST`.  If the |session| is initialized
- * with the version :macro:`SPDYLAY_PROTO_SPDY3`, the lowest priority
- * value is :macro:`SPDYLAY_SPDY3_PRI_LOWEST`.
+ * value. Use `spdylay_session_get_pri_lowest()` to know the lowest
+ * priority value for this |session|.
  *
  * The |nv| contains the name/value pairs. For i > 0, ``nv[2*i]``
  * contains a pointer to the name string and ``nv[2*i+1]`` contains a

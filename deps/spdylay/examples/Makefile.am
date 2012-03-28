@@ -23,7 +23,7 @@
 
 AM_CFLAGS = -Wall
 AM_CPPFLAGS = -Wall -I$(srcdir)/../lib/includes -I$(builddir)/../lib/includes \
-	@OPENSSL_CFLAGS@
+	@OPENSSL_CFLAGS@ @DEFS@
 AM_LDFLAGS = @OPENSSL_LIBS@
 LDADD = $(top_builddir)/lib/libspdylay.la
 
@@ -56,7 +56,7 @@ spdyd_SOURCES = ${HELPER_OBJECTS} ${HELPER_HFILES} \
 	spdyd.cc
 
 if HAVE_STDCXX_11
-bin_PROGRAMS += spdynative
+noinst_PROGRAMS = spdynative
 spdynative_CXXFLAGS = -std=c++0x
 spdynative_SOURCES = ${HELPER_OBJECTS} ${HELPER_HFILES} \
 	${EVENT_OBJECTS} ${EVENT_HFILES} \

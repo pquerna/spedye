@@ -23,7 +23,7 @@
 SUBDIRS = includes
 
 AM_CFLAGS = -Wall
-AM_CPPFLAGS = -I$(srcdir)/includes -I$(builddir)/includes
+AM_CPPFLAGS = -I$(srcdir)/includes -I$(builddir)/includes @DEFS@
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libspdylay.pc
@@ -40,7 +40,8 @@ HFILES = spdylay_pq.h spdylay_int.h spdylay_map.h spdylay_queue.h \
 	spdylay_buffer.h spdylay_frame.h spdylay_zlib.h \
 	spdylay_session.h spdylay_helper.h spdylay_stream.h spdylay_int.h \
 	spdylay_npn.h \
-	spdylay_submit.h spdylay_outbound_item.h
+	spdylay_submit.h spdylay_outbound_item.h \
+	spdylay_net.h
 
 libspdylay_la_SOURCES = $(HFILES) $(OBJECTS)
 libspdylay_la_LDFLAGS = -no-undefined \
