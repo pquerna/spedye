@@ -21,10 +21,13 @@
         }],
       ],
      'sources': [
+       'src/spedye.h',
+       'src/spedye_error.h',
        'src/spedye_init.c',
        'src/spedye_master.c',
        'src/spedye_worker.c',
        'src/spedye_conf.c',
+       'src/spedye_error.c',
      ],
      'include_dirs': [
        'src',
